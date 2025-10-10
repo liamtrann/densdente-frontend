@@ -1,34 +1,52 @@
-import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
+// src/App.js
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+// Auth shell
+import { AuthProvider } from "./frontend/auth/AuthContext";
+import RequireAuth from "./frontend/auth/RequireAuth";
+
+// Pages
+import Login from "./frontend/pages/auth/Login.jsx";
+import Signup from "./frontend/pages/auth/Signup.jsx";
 import Admin from "./frontend/pages/Admin.jsx";
 import Report from "./frontend/pages/Report.jsx";
 import Scheduling from "./frontend/pages/scheduling/Scheduling.jsx";
 
-function Home() {
-  return (
-    <div style={{ padding: 24 }}>
-      <h1>Dentaparse</h1>
-      <p>Home page</p>
-      {/* Dev-only quick links */}
-      <nav style={{ marginTop: 16 }}>
-        <Link to="/admin" style={{ marginRight: 12 }}>Admin</Link>
-        <Link to="/report">Report</Link>
-      </nav>
-    </div>
-  );
-}
-
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/report" element={<Report />} />
-        {/* optional: redirect unknown routes to home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
-        <Route path="/scheduling" element={<Scheduling />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Protected routes */}
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth>
+                <Admin />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/scheduling"
+            element={
+              <RequireAuth>
+                <Scheduling />
+              </RequireAuth>
+            }
+          />
+
+          {/* Keep /report public for now */}
+          <Route path="/report" element={<Report />} />
+
+          {/* Redirects */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
