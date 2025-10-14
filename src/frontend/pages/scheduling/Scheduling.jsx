@@ -2,9 +2,10 @@ import "./scheduling.css";
 import Breadcrumbs from "../../common/Breadcrumbs";
 import Button from "../../common/Button";
 import Card from "../../common/Card";
-import { Table, THead, Th, TBody, Tr, Td } from "../../common/Table";
+import Pagination from "../../common/Pagination"; // <-- new
 import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
+import DataTable from "../../common/DataTable";
 
 const allRows = [
   {
@@ -83,28 +84,51 @@ export default function Scheduling() {
   const [tab, setTab] = useState("practitioners");
   const [q, setQ] = useState("");
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
-  const rows = useMemo(() => {
-    const filtered = allRows.filter((r) =>
-      `${r.clinic} ${r.first} ${r.last}`.toLowerCase().includes(q.toLowerCase())
-    );
-    const start = (page - 1) * pageSize;
-    return {
-      total: filtered.length,
-      data: filtered.slice(start, start + pageSize),
-    };
-  }, [q, page]);
+  const filtered = useMemo(
+    () =>
+      allRows.filter((r) =>
+        `${r.clinic} ${r.first} ${r.last}`
+          .toLowerCase()
+          .includes(q.toLowerCase())
+      ),
+    [q]
+  );
+
+  const total = filtered.length;
+  const start = (page - 1) * pageSize;
+  const data = filtered.slice(start, start + pageSize);
+
+  const handlePageSizeChange = (n) => {
+    setPage(1);
+    setPageSize(n);
+  };
+
+  const columns = [
+    { key: "clinic", header: "Clinic", width: 160, nowrap: true },
+    { key: "first", header: "First Name" },
+    { key: "last", header: "Last Name" },
+    { key: "role", header: "DDS/HYG", width: 110 },
+    { key: "status", header: "Status", width: 120 },
+    {
+      header: "Actions",
+      align: "right",
+      nowrap: true,
+      render: () => (
+        <Button variant="outline" size="sm">
+          Edit
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <div className="sched-page">
       <div className="topbar">
         <div className="topbar__left">
           <Breadcrumbs
-            items={[
-              { label: "Pages", to: "/" },
-              { label: "Scheduling Dashboard" },
-            ]}
+            items={[{ label: "Pages" }, { label: "Scheduling Dashboard" }]}
           />
           <h1 className="topbar__title">Scheduling Dashboard</h1>
         </div>
@@ -147,60 +171,22 @@ export default function Scheduling() {
             }}
           />
 
-          <div style={{ marginTop: 12 }}>
-            <Table>
-              <THead>
-                <Th>Clinic</Th>
-                <Th>First Name</Th>
-                <Th>Last Name</Th>
-                <Th>DDS/HYG</Th>
-                <Th>Status</Th>
-                <Th>Actions</Th>
-              </THead>
-              <TBody>
-                {rows.data.map((r, i) => (
-                  <Tr key={i}>
-                    <Td>{r.clinic}</Td>
-                    <Td>{r.first}</Td>
-                    <Td>{r.last}</Td>
-                    <Td>{r.role}</Td>
-                    <Td>{r.status}</Td>
-                    <Td>
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                    </Td>
-                  </Tr>
-                ))}
-              </TBody>
-            </Table>
-          </div>
+          <div style={{ marginTop: 12 }}></div>
 
-          <div className="pager">
-            <span>
-              Page {page} of {Math.max(1, Math.ceil(rows.total / pageSize))}
-            </span>
-            <div className="pager__right">
-              <label>Go to page:</label>
-              <select
-                value={page}
-                onChange={(e) => setPage(parseInt(e.target.value, 10))}
-              >
-                {Array.from(
-                  { length: Math.max(1, Math.ceil(rows.total / pageSize)) },
-                  (_, i) => i + 1
-                ).map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-              <label>Show</label>
-              <select disabled>
-                <option>{pageSize}</option>
-              </select>
-            </div>
-          </div>
+          <DataTable
+            columns={columns}
+            data={data}
+            rowKey={(r, i) => `${r.clinic}-${i}`}
+          />
+
+          {/* Reusable paginator */}
+          <Pagination
+            page={page}
+            pageSize={pageSize}
+            total={total}
+            onPageChange={setPage}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </Card>
       )}
 
