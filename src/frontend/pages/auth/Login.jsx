@@ -1,8 +1,5 @@
-// src/frontend/pages/auth/Login.jsx
-import "./auth.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
-
 import AuthLayout from "../../common/AuthLayout";
 import AuthCard from "../../common/AuthCard";
 import AuthField from "../../common/AuthField";
@@ -17,9 +14,7 @@ export default function Login() {
 
   function onSubmit(e) {
     e.preventDefault();
-    const form = new FormData(e.currentTarget);
-    const email = form.get("email");
-    // TODO: real API call
+    const email = new FormData(e.currentTarget).get("email");
     login({ email });
     navigate(from, { replace: true });
   }

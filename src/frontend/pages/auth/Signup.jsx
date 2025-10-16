@@ -1,5 +1,5 @@
 // src/frontend/pages/auth/Signup.jsx
-import "./auth.css";
+
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 

@@ -12,6 +12,8 @@ import Admin from "./frontend/pages/Admin.jsx";
 import Report from "./frontend/pages/Report.jsx";
 import Scheduling from "./frontend/pages/scheduling/Scheduling.jsx";
 
+<div className="p-6 bg-indigo-600 text-white font-bold">TAILWIND WORKS</div>
+
 export default function App() {
   return (
     <AuthProvider>

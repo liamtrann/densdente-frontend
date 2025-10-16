@@ -1,13 +1,13 @@
-export default function Card({ children, title, right, style }) {
+export default function Card({ children, title, right, className = "" }) {
   return (
-    <div className="card" style={style}>
+    <div className={`bg-white rounded-2xl shadow-md ${className}`}>
       {(title || right) && (
-        <div className="card__head">
-          {title && <h3 className="card__title">{title}</h3>}
-          {right && <div className="card__right">{right}</div>}
+        <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+          {title && <h3 className="m-0 text-base font-semibold">{title}</h3>}
+          {right && <div>{right}</div>}
         </div>
       )}
-      <div className="card__body">{children}</div>
+      <div className="p-4">{children}</div>
     </div>
   );
 }
