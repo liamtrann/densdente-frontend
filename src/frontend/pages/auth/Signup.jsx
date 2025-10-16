@@ -1,13 +1,13 @@
-// src/frontend/pages/auth/Login.jsx
-import {
-  AuthLayout,
-  AuthCard,
-  AuthField,
-  AuthSubmit,
-  AuthAltLink,
-} from "../../common";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
-import { useNavigate, useLocation } from "react-router-dom";
+import {
+  FormLayout,
+  FormCard,
+  FormField,
+  FormSubmit,
+  FormAltLink,
+} from "../../common";
+
 export default function Signup() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -16,30 +16,29 @@ export default function Signup() {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const email = form.get("email");
-    // TODO: create account via backend
-    login({ email }); // auto-login
+    login({ email }); // auto-login after signup
     navigate("/admin", { replace: true });
   }
 
   return (
-    <AuthLayout>
-      <AuthCard title="Create Account" onSubmit={onSubmit}>
-        <AuthField label="Full name" name="name" placeholder="Your name" />
-        <AuthField
+    <FormLayout>
+      <FormCard title="Create Account" onSubmit={onSubmit}>
+        <FormField label="Full name" name="name" placeholder="Your name" />
+        <FormField
           label="Email"
           name="email"
           type="email"
           placeholder="Enter your email"
         />
-        <AuthField
+        <FormField
           label="Password"
           name="password"
           type="password"
           placeholder="Min. 6 characters"
         />
-        <AuthSubmit>Sign Up</AuthSubmit>
-        <AuthAltLink to="/login">Already have an account? Sign in</AuthAltLink>
-      </AuthCard>
-    </AuthLayout>
+        <FormSubmit>Sign Up</FormSubmit>
+        <FormAltLink to="/login">Already have an account? Sign in</FormAltLink>
+      </FormCard>
+    </FormLayout>
   );
 }

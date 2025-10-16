@@ -1,16 +1,15 @@
-// src/frontend/pages/auth/Login.jsx
-import {
-  AuthLayout,
-  AuthCard,
-  AuthField,
-  AuthSubmit,
-  AuthAltLink,
-} from "../../common";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
-import { useNavigate, useLocation } from "react-router-dom";
+import {
+  FormLayout,
+  FormCard,
+  FormField,
+  FormSubmit,
+  FormAltLink,
+} from "../../common";
 
 export default function Login() {
-  const { login } = useAuth(); // single hook
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/admin";
@@ -18,29 +17,28 @@ export default function Login() {
   function onSubmit(e) {
     e.preventDefault();
     const email = new FormData(e.currentTarget).get("email");
-    // TODO: real API auth
     login({ email });
     navigate(from, { replace: true });
   }
 
   return (
-    <AuthLayout>
-      <AuthCard title="Sign In" onSubmit={onSubmit}>
-        <AuthField
+    <FormLayout>
+      <FormCard title="Sign In" onSubmit={onSubmit}>
+        <FormField
           label="Email"
           name="email"
           type="email"
           placeholder="Enter your email"
         />
-        <AuthField
+        <FormField
           label="Password"
           name="password"
           type="password"
           placeholder="Min. 6 characters"
         />
-        <AuthSubmit>Sign In</AuthSubmit>
-        <AuthAltLink to="/signup">Create an account</AuthAltLink>
-      </AuthCard>
-    </AuthLayout>
+        <FormSubmit>Sign In</FormSubmit>
+        <FormAltLink to="/signup">Create an account</FormAltLink>
+      </FormCard>
+    </FormLayout>
   );
 }
