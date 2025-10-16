@@ -1,0 +1,5 @@
+export { default as Admin } from "./Admin";
+export { default as Report } from "./Report";
+export { default as Scheduling } from "./scheduling/Scheduling";
+export { default as Login } from "./auth/Login";
+export { default as Signup } from "./auth/Signup";

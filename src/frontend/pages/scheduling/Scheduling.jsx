@@ -1,11 +1,16 @@
-
-import Breadcrumbs from "../../common/Breadcrumbs";
-import Button from "../../common/Button";
-import Card from "../../common/Card";
-import Pagination from "../../common/Pagination"; // <-- new
-import { Link } from "react-router-dom";
+// src/frontend/pages/scheduling/Scheduling.jsx
 import { useMemo, useState } from "react";
-import DataTable from "../../common/DataTable";
+import { Link } from "react-router-dom";
+import {
+  Breadcrumbs,
+  Button,
+  Card,
+  Pagination,
+  DataTable,
+  LogoutButton,
+  Page, // <-- add
+  Tabs,
+} from "../../common";
 
 const allRows = [
   {
@@ -95,106 +100,97 @@ export default function Scheduling() {
       ),
     [q]
   );
-
   const total = filtered.length;
   const start = (page - 1) * pageSize;
   const data = filtered.slice(start, start + pageSize);
-
-  const handlePageSizeChange = (n) => {
-    setPage(1);
-    setPageSize(n);
-  };
 
   const columns = [
     { key: "clinic", header: "Clinic", width: 160, nowrap: true },
     { key: "first", header: "First Name" },
     { key: "last", header: "Last Name" },
-    { key: "role", header: "DDS/HYG", width: 110 },
-    { key: "status", header: "Status", width: 120 },
+    { key: "role", header: "DDS/HYG", width: 110, nowrap: true },
+    { key: "status", header: "Status", width: 120, nowrap: true },
     {
       header: "Actions",
       align: "right",
       nowrap: true,
-      render: () => (
-        <Button variant="outline" size="sm">
-          Edit
-        </Button>
-      ),
+      render: () => <Button size="sm">Edit</Button>,
     },
   ];
 
   return (
-    <div className="sched-page">
-      <div className="topbar">
-        <div className="topbar__left">
+    <Page>
+      {/* Topbar */}
+      <div className="flex items-start justify-between gap-4 mb-6">
+        <div>
           <Breadcrumbs
             items={[{ label: "Pages" }, { label: "Scheduling Dashboard" }]}
           />
-          <h1 className="topbar__title">Scheduling Dashboard</h1>
+          <h1 className="mt-2 text-[32px] leading-tight font-extrabold">
+            Scheduling Dashboard
+          </h1>
         </div>
-        <div className="topbar__right">
+        <div className="flex gap-3">
           <Button as={Link} to="/admin" variant="outline">
             Back to Admin Dashboard
           </Button>
-          <Button variant="ghost">Logout</Button>
+          <LogoutButton /> {/* was: <Button variant="ghost">Logout</Button> */}
         </div>
       </div>
 
-      <div className="tabs">
-        <button
-          className={`tab ${tab === "practitioners" ? "is-active" : ""}`}
-          onClick={() => setTab("practitioners")}
-        >
-          Practitioners
-        </button>
-        <button
-          className={`tab ${tab === "upload" ? "is-active" : ""}`}
-          onClick={() => setTab("upload")}
-        >
-          Upload Practitioners
-        </button>
-      </div>
+      {/* Tabs */}
+      <Tabs
+        value={tab}
+        onChange={setTab}
+        items={[
+          { id: "practitioners", label: "Practitioners" },
+          { id: "upload", label: "Upload Practitioners" },
+        ]}
+      />
 
       {tab === "practitioners" && (
         <Card title="Practitioners">
-          <p className="muted" style={{ marginTop: -6, marginBottom: 12 }}>
+          <p className="text-gray-500 -mt-1 mb-3">
             View and manage clinic practitioners below.
           </p>
 
           <input
-            className="search"
-            placeholder="Search for Practitioners by Clinic or Name..."
             value={q}
             onChange={(e) => {
               setPage(1);
               setQ(e.target.value);
             }}
+            placeholder="Search for Practitioners by Clinic or Name..."
+            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 bg-white outline-none focus:ring-2 focus:ring-indigo-200"
           />
 
-          <div style={{ marginTop: 12 }}></div>
+          <div className="mt-4" />
 
-          <DataTable
-            columns={columns}
-            data={data}
-            rowKey={(r, i) => `${r.clinic}-${i}`}
-          />
-
-          {/* Reusable paginator */}
-          <Pagination
-            page={page}
-            pageSize={pageSize}
-            total={total}
-            onPageChange={setPage}
-            onPageSizeChange={handlePageSizeChange}
-          />
+          <Card bodyClassName="p-0" className="shadow-none">
+            <DataTable
+              columns={columns}
+              data={data}
+              rowKey={(r, i) => `${r.clinic}-${i}`}
+            />
+            <Pagination
+              page={page}
+              pageSize={pageSize}
+              total={total}
+              onPageChange={setPage}
+              onPageSizeChange={(n) => {
+                setPage(1);
+                setPageSize(n);
+              }}
+            />
+          </Card>
         </Card>
       )}
 
       {tab === "upload" && (
         <Card title="Upload Practitioners">
-          <p className="muted">Coming soon: CSV upload form.</p>
+          <p className="text-gray-500">Coming soon: CSV upload form.</p>
         </Card>
       )}
-    </div>
+    </Page>
   );
 }

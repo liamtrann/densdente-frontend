@@ -1,13 +1,16 @@
-import { useLocation, useNavigate } from "react-router-dom";
+// src/frontend/pages/auth/Login.jsx
+import {
+  AuthLayout,
+  AuthCard,
+  AuthField,
+  AuthSubmit,
+  AuthAltLink,
+} from "../../common";
 import { useAuth } from "../../auth/AuthContext";
-import AuthLayout from "../../common/AuthLayout";
-import AuthCard from "../../common/AuthCard";
-import AuthField from "../../common/AuthField";
-import AuthSubmit from "../../common/AuthSubmit";
-import AuthAltLink from "../../common/AuthAltLink";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login } = useAuth(); // single hook
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/admin";
@@ -15,6 +18,7 @@ export default function Login() {
   function onSubmit(e) {
     e.preventDefault();
     const email = new FormData(e.currentTarget).get("email");
+    // TODO: real API auth
     login({ email });
     navigate(from, { replace: true });
   }

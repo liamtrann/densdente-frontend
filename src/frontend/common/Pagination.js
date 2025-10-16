@@ -1,63 +1,57 @@
-// src/frontend/common/Paginaton.js
 export default function Pagination({
-    page,                   // 1-based
+    page,
     pageSize,
-    total,                  // total items
+    total,
     onPageChange,
     onPageSizeChange,
     pageSizeOptions = [10, 25, 50],
 }) {
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
-    const canPrev = page > 1;
-    const canNext = page < totalPages;
+    const go = (n) =>
+        onPageChange?.(Math.min(Math.max(1, n), totalPages));
 
-    const go = (n) => onPageChange?.(Math.min(Math.max(1, n), totalPages));
+    const Btn = (props) => (
+        <button
+            {...props}
+            className={`inline-flex items-center justify-center rounded-full border-2 border-indigo-300 px-3 py-1.5 text-xs font-semibold text-indigo-600 hover:border-indigo-400 disabled:opacity-40 disabled:cursor-not-allowed ${props.className || ""}`}
+        />
+    );
 
     return (
-        <div className="pager">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-gray-600 px-5 py-4">
             <span>
-                Page {page} of {totalPages}
+                Page <span className="font-semibold">{page}</span> of{" "}
+                <span className="font-semibold">{totalPages}</span>
             </span>
 
-            <div className="pager__right">
-                {/* first / prev */}
-                <button className="btn btn--outline btn--sm" onClick={() => go(1)} disabled={!canPrev}>
-                    «
-                </button>
-                <button className="btn btn--outline btn--sm" onClick={() => go(page - 1)} disabled={!canPrev}>
-                    ‹
-                </button>
+            <div className="flex items-center gap-2">
+                <Btn onClick={() => go(1)} disabled={page <= 1}>«</Btn>
+                <Btn onClick={() => go(page - 1)} disabled={page <= 1}>‹</Btn>
 
-                {/* go to page */}
-                <label style={{ marginLeft: 8 }}>Go to page:</label>
-                <select value={page} onChange={(e) => go(parseInt(e.target.value, 10))}>
+                <label className="ml-2">Go to page:</label>
+                <select
+                    className="border rounded-md px-2 py-1"
+                    value={page}
+                    onChange={(e) => go(parseInt(e.target.value, 10))}
+                >
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-                        <option key={n} value={n}>
-                            {n}
-                        </option>
+                        <option key={n} value={n}>{n}</option>
                     ))}
                 </select>
 
-                {/* page size */}
-                <label style={{ marginLeft: 8 }}>Show</label>
+                <label className="ml-2">Show</label>
                 <select
+                    className="border rounded-md px-2 py-1"
                     value={pageSize}
                     onChange={(e) => onPageSizeChange?.(parseInt(e.target.value, 10))}
                 >
                     {pageSizeOptions.map((n) => (
-                        <option key={n} value={n}>
-                            {n}
-                        </option>
+                        <option key={n} value={n}>{n}</option>
                     ))}
                 </select>
 
-                {/* next / last */}
-                <button className="btn btn--outline btn--sm" onClick={() => go(page + 1)} disabled={!canNext} style={{ marginLeft: 8 }}>
-                    ›
-                </button>
-                <button className="btn btn--outline btn--sm" onClick={() => go(totalPages)} disabled={!canNext}>
-                    »
-                </button>
+                <Btn className="ml-2" onClick={() => go(page + 1)} disabled={page >= totalPages}>›</Btn>
+                <Btn onClick={() => go(totalPages)} disabled={page >= totalPages}>»</Btn>
             </div>
         </div>
     );

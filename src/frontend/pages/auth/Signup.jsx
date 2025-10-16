@@ -1,14 +1,13 @@
-// src/frontend/pages/auth/Signup.jsx
-
-import { useNavigate } from "react-router-dom";
+// src/frontend/pages/auth/Login.jsx
+import {
+  AuthLayout,
+  AuthCard,
+  AuthField,
+  AuthSubmit,
+  AuthAltLink,
+} from "../../common";
 import { useAuth } from "../../auth/AuthContext";
-
-import AuthLayout from "../../common/AuthLayout";
-import AuthCard from "../../common/AuthCard";
-import AuthField from "../../common/AuthField";
-import AuthSubmit from "../../common/AuthSubmit";
-import AuthAltLink from "../../common/AuthAltLink";
-
+import { useNavigate, useLocation } from "react-router-dom";
 export default function Signup() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -17,8 +16,8 @@ export default function Signup() {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const email = form.get("email");
-    // TODO: create account via backend, then:
-    login({ email }); // auto-login after signup
+    // TODO: create account via backend
+    login({ email }); // auto-login
     navigate("/admin", { replace: true });
   }
 

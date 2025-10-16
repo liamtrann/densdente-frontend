@@ -1,29 +1,17 @@
-// src/frontend/common/DataTable.jsx
-/**
- * columns: [
- *   { key: "clinic", header: "Clinic", width: 160 },
- *   { header: "Actions", render: (row, i) => <Button>...</Button>, align: "right" }
- * ]
- * data: array of row objects
- * rowKey: string key on each row (or function) to produce stable keys
- */
 export default function DataTable({ columns = [], data = [], rowKey }) {
-  const getKey = (row, i) =>
+  const keyFor = (row, i) =>
     typeof rowKey === "function" ? rowKey(row, i) : rowKey ? row[rowKey] : i;
 
   return (
-    <div className="table-wrap">
-      <table className="table">
+    <div className="overflow-auto">
+      <table className="w-full border-separate border-spacing-0 text-[15px]">
         <thead>
           <tr>
             {columns.map((col, i) => (
               <th
                 key={i}
-                style={{
-                  width: col.width,
-                  textAlign: col.align || "left",
-                  whiteSpace: col.nowrap ? "nowrap" : undefined,
-                }}
+                className="px-4 py-3 text-left text-[12px] font-semibold text-gray-500 border-b border-gray-100 whitespace-nowrap"
+                style={{ width: col.width, textAlign: col.align || "left" }}
               >
                 {col.header}
               </th>
@@ -31,9 +19,12 @@ export default function DataTable({ columns = [], data = [], rowKey }) {
           </tr>
         </thead>
 
-        <tbody>
+        <tbody className="divide-y divide-gray-100">
           {data.map((row, rIdx) => (
-            <tr key={getKey(row, rIdx)}>
+            <tr
+              key={keyFor(row, rIdx)}
+              className="hover:bg-indigo-50/30 transition-colors"
+            >
               {columns.map((col, cIdx) => {
                 const value = col.render
                   ? col.render(row, rIdx)
@@ -43,6 +34,7 @@ export default function DataTable({ columns = [], data = [], rowKey }) {
                 return (
                   <td
                     key={cIdx}
+                    className="px-4 py-3 align-middle"
                     style={{
                       textAlign: col.align || "left",
                       whiteSpace: col.nowrap ? "nowrap" : undefined,

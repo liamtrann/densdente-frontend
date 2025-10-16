@@ -1,12 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useLocation, Navigate } from "react-router-dom";
 
 const AuthCtx = createContext(null);
 
 export function AuthProvider({ children }) {
-  // very simple: store a boolean + demo user in localStorage
   const [user, setUser] = useState(() => {
     try {
-      const raw = localStorage.getItem("dentaparse_auth");
+      const raw = localStorage.getItem("dp_user");
       return raw ? JSON.parse(raw) : null;
     } catch {
       return null;
@@ -14,16 +14,16 @@ export function AuthProvider({ children }) {
   });
 
   useEffect(() => {
-    if (user) localStorage.setItem("dentaparse_auth", JSON.stringify(user));
-    else localStorage.removeItem("dentaparse_auth");
+    if (user) localStorage.setItem("dp_user", JSON.stringify(user));
+    else localStorage.removeItem("dp_user");
   }, [user]);
 
   const value = useMemo(
     () => ({
       user,
-      isAuthenticated: !!user,
-      login: (payload) => setUser(payload || { email: "demo@dentaparse.com" }),
+      login: (u) => setUser(u),
       logout: () => setUser(null),
+      isAuthed: !!user,
     }),
     [user]
   );
@@ -32,5 +32,15 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-  return useContext(AuthCtx);
+  const ctx = useContext(AuthCtx);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
+}
+
+// simple guard component if you ever need inline guarding
+export function Guard({ children }) {
+  const { isAuthed } = useAuth();
+  const loc = useLocation();
+  if (!isAuthed) return <Navigate to="/login" replace state={{ from: loc }} />;
+  return children;
 }
