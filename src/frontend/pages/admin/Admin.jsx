@@ -1,4 +1,3 @@
-// src/frontend/pages/Admin.jsx
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -8,10 +7,14 @@ import {
   Badge,
   Pagination,
   DataTable,
-  StatCard, // if you use it
+  StatCard,
   LogoutButton,
   Page,
-} from "../common"; // <— page imports only from ../common to avoid cycles
+} from "../../common";
+import Tabs from "../../common/Tabs"; // NEW
+import PerformancePatients from "./PerformancePatients"; // NEW
+import Forecasts from "./Forecasts";
+import Downloads from "./Downloads";
 
 const allRows = [
   {
@@ -49,6 +52,9 @@ const allRows = [
 export default function Admin() {
   const today = new Date().toLocaleDateString("en-CA");
 
+  // tabs
+  const [tab, setTab] = useState("overview");
+
   // pagination
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -60,7 +66,7 @@ export default function Admin() {
     };
   }, [page, pageSize]);
 
-  // columns
+  // table columns
   const columns = [
     { key: "clinic", header: "Clinic", width: 160, nowrap: true },
     {
@@ -92,21 +98,20 @@ export default function Admin() {
       align: "right",
       nowrap: true,
       render: () => (
-        <>
-          <Button size="sm" className="mr-2">
-            Go to Clinic Dashboard
-          </Button>
-          <Button as={Link} to="/scheduling" size="sm">
-            To Scheduling Dashboard
-          </Button>
-        </>
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full px-4 py-1.5 border-2 border-indigo-300 text-indigo-700 hover:border-indigo-400"
+        >
+          Go to Clinic Dashboard
+        </Button>
       ),
     },
   ];
 
   return (
     <Page>
-      {/* Topbar */}
+      {/* Top bar */}
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
           <Breadcrumbs
@@ -120,13 +125,11 @@ export default function Admin() {
           <Button as={Link} to="/scheduling" variant="outline">
             To Scheduling Dashboard
           </Button>
-          <LogoutButton /> {/* was: <Button variant="ghost">Logout</Button> */}
+          <LogoutButton />
         </div>
       </div>
-
-      {/* Overview */}
-      <div className="mb-6">
-        <h2 className="text-lg font-bold mb-3">Overview</h2>
+      {/* Overview stats */}
+      <div className="mb-4">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <StatCard icon="📅" label="Date" value={today} />
           <StatCard
@@ -146,25 +149,42 @@ export default function Admin() {
           />
         </div>
       </div>
+      {/* Tabs (matches your reference UI) */}
+      <Tabs
+        value={tab}
+        onChange={setTab}
+        items={[
+          { key: "overview", label: "Overview" },
 
-      {/* Reporting Status */}
-      <div>
-        <h2 className="text-lg font-bold mb-3">Reporting Status</h2>
-
-        <Card bodyClassName="p-0">
-          <DataTable columns={columns} data={data} rowKey={(r) => r.clinic} />
-          <Pagination
-            page={page}
-            pageSize={pageSize}
-            total={total}
-            onPageChange={setPage}
-            onPageSizeChange={(n) => {
-              setPage(1);
-              setPageSize(n);
-            }}
-          />
-        </Card>
-      </div>
+          { key: "performance", label: "Performance & Patients" },
+          { key: "forecasts", label: "Forecasts" },
+          { key: "download", label: "Download" },
+        ]}
+      />
+      {/* Overview table */}
+      {tab === "overview" && (
+        <div className="mt-2">
+          <h2 className="text-lg font-bold mb-3">Reporting Status</h2>
+          <Card bodyClassName="p-0">
+            <DataTable columns={columns} data={data} rowKey={(r) => r.clinic} />
+            <Pagination
+              page={page}
+              pageSize={pageSize}
+              total={total}
+              onPageChange={setPage}
+              onPageSizeChange={(n) => {
+                setPage(1);
+                setPageSize(n);
+              }}
+            />
+          </Card>
+        </div>
+      )}
+      {tab === "performance" && <PerformancePatients />} {/* NEW */}
+      {tab === "performance" && <PerformancePatients />}{" "}
+      {tab === "download" && <Downloads />}
+      {/* if you have this */}+ {tab === "forecasts" && <Forecasts />}{" "}
+      {/* NEW */}
     </Page>
   );
 }

@@ -1,20 +1,24 @@
-// Minimal pill-style tabs
-export default function Tabs({ value, onChange, items = [] }) {
+// Simple pill tabs
+export default function Tabs({ items = [], value, onChange, className = "" }) {
   return (
-    <div className="flex gap-3 my-2">
-      {items.map(({ id, label }) => {
-        const active = value === id;
+    <div className={`flex gap-3 my-4 ${className}`}>
+      {items.map((it) => {
+        const active = it.key === value;
         return (
           <button
-            key={id}
-            onClick={() => onChange?.(id)}
-            className={`px-4 py-2 rounded-full font-bold transition-colors ${
+            key={it.key}
+            type="button"
+            onClick={() => onChange?.(it.key)}
+            className={[
+              "px-5 py-2 rounded-full font-bold transition-colors",
               active
-                ? "bg-indigo-600 text-white"
-                : "bg-indigo-50 text-indigo-700"
-            }`}
+                ? "bg-indigo-600 text-white shadow-sm"
+                : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100",
+              it.disabled && "opacity-50 cursor-not-allowed",
+            ].join(" ")}
+            disabled={it.disabled}
           >
-            {label}
+            {it.label}
           </button>
         );
       })}
