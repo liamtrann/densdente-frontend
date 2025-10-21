@@ -1,5 +1,5 @@
 // src/frontend/pages/scheduling/Scheduling.jsx
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Breadcrumbs,
@@ -8,7 +8,7 @@ import {
   Pagination,
   DataTable,
   LogoutButton,
-  Page, // <-- add
+  Page,
   Tabs,
 } from "../../common";
 
@@ -114,9 +114,41 @@ export default function Scheduling() {
       header: "Actions",
       align: "right",
       nowrap: true,
-      render: () => <Button size="sm">Edit</Button>,
+      render: () => (
+        <Button
+          size="sm"
+          variant="primary"
+          className="rounded-full px-4 py-1.5 bg-indigo-600 text-white hover:bg-indigo-700"
+        >
+          Edit
+        </Button>
+      ),
     },
   ];
+
+  // Upload handlers
+  const fileInputRef = useRef(null);
+  const templateHref = "/templates/practitioner_upload_template.xlsx"; // place file in /public/templates
+
+  function triggerUpload() {
+    fileInputRef.current?.click();
+  }
+  function onFileSelected(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const ok =
+      file.name.endsWith(".xlsx") ||
+      file.name.endsWith(".xls") ||
+      file.name.endsWith(".csv");
+    if (!ok) {
+      alert("Please select a .xlsx, .xls, or .csv file.");
+      e.target.value = "";
+      return;
+    }
+    // TODO: send to backend
+    alert(`Selected: ${file.name}`);
+    e.target.value = "";
+  }
 
   return (
     <Page>
@@ -134,7 +166,7 @@ export default function Scheduling() {
           <Button as={Link} to="/admin" variant="outline">
             Back to Admin Dashboard
           </Button>
-          <LogoutButton /> {/* was: <Button variant="ghost">Logout</Button> */}
+          <LogoutButton />
         </div>
       </div>
 
@@ -143,11 +175,12 @@ export default function Scheduling() {
         value={tab}
         onChange={setTab}
         items={[
-          { id: "practitioners", label: "Practitioners" },
-          { id: "upload", label: "Upload Practitioners" },
+          { key: "practitioners", label: "Practitioners" },
+          { key: "upload", label: "Upload Practitioners" },
         ]}
       />
 
+      {/* Practitioners list */}
       {tab === "practitioners" && (
         <Card title="Practitioners">
           <p className="text-gray-500 -mt-1 mb-3">
@@ -186,9 +219,59 @@ export default function Scheduling() {
         </Card>
       )}
 
+      {/* Upload Practitioners */}
       {tab === "upload" && (
-        <Card title="Upload Practitioners">
-          <p className="text-gray-500">Coming soon: CSV upload form.</p>
+        <Card className="rounded-2xl shadow-md bg-indigo-50 border border-indigo-100">
+          <h3 className="text-[18px] font-bold mb-2 text-indigo-900">
+            Add New Practitioners
+          </h3>
+
+          <p className="text-indigo-900/80">
+            To add new practitioners, download our Excel template, fill it out
+            following the same columns, and upload it.
+          </p>
+
+          {/* Download button (blue pill) */}
+          <div className="mt-5 mb-2 flex justify-center">
+            <Button
+              as="a"
+              href={templateHref}
+              download
+              variant="primary"
+              className="rounded-full px-5 py-2.5 shadow-sm bg-indigo-600 text-white hover:bg-indigo-700 inline-flex items-center gap-2"
+            >
+              <span className="-mt-[1px]">⬇️</span>
+              <span>Download Template</span>
+            </Button>
+          </div>
+
+          {/* Divider */}
+          <div className="my-5 border-t border-indigo-200/60" />
+
+          {/* Helper line */}
+          <p className="text-center text-indigo-900/80 mb-4">
+            After filling out the template, click the button below to upload the
+            file. Please ensure to follow the template format.
+          </p>
+
+          {/* Upload button (blue pill) */}
+          <div className="flex justify-center">
+            <Button
+              variant="primary"
+              className="rounded-full px-5 py-2.5 bg-indigo-600 text-white hover:bg-indigo-700 inline-flex items-center gap-2"
+              onClick={triggerUpload}
+            >
+              <span className="-mt-[1px]">📎</span>
+              <span>Upload Practitioners</span>
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              onChange={onFileSelected}
+              className="hidden"
+            />
+          </div>
         </Card>
       )}
     </Page>

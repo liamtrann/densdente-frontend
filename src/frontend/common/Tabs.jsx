@@ -1,24 +1,31 @@
-// Simple pill tabs
-export default function Tabs({ items = [], value, onChange, className = "" }) {
+// Simple controlled Tabs
+export default function Tabs({
+  value, // string: the active tab key
+  onChange, // (key) => void
+  items = [], // [{ key, label, disabled? }]
+  className = "",
+}) {
   return (
-    <div className={`flex gap-3 my-4 ${className}`}>
-      {items.map((it) => {
-        const active = it.key === value;
+    <div className={`flex gap-3 mb-4 ${className}`}>
+      {items.map((t) => {
+        const active = value === t.key;
         return (
           <button
-            key={it.key}
+            key={t.key}
             type="button"
-            onClick={() => onChange?.(it.key)}
-            className={[
-              "px-5 py-2 rounded-full font-bold transition-colors",
-              active
-                ? "bg-indigo-600 text-white shadow-sm"
-                : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100",
-              it.disabled && "opacity-50 cursor-not-allowed",
-            ].join(" ")}
-            disabled={it.disabled}
+            disabled={t.disabled}
+            onClick={() => !t.disabled && onChange?.(t.key)}
+            className={
+              `px-5 py-2 rounded-full font-bold transition-colors ` +
+              (active
+                ? "bg-indigo-600 text-white"
+                : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100") +
+              (t.disabled ? " opacity-50 cursor-not-allowed" : "")
+            }
+            role="tab"
+            aria-selected={active}
           >
-            {it.label}
+            {t.label}
           </button>
         );
       })}
