@@ -183,7 +183,7 @@ export default function Admin() {
       {tab === "performance" && <PerformancePatients />} {/* NEW */}
       {tab === "performance" && <PerformancePatients />}{" "}
       {tab === "download" && <Downloads />}
-      {/* if you have this */}+ {tab === "forecasts" && <Forecasts />}{" "}
+      {/* if you have this */} {tab === "forecasts" && <Forecasts />}{" "}
       {/* NEW */}
     </Page>
   );

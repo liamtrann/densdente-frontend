@@ -1,4 +1,39 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+// src/frontend/auth/AuthContext.jsx
+import { createContext, useContext } from "react";
+
+// Minimal no-auth context: always "authed"; login/logout are no-ops.
+const AuthCtx = createContext({
+  user: null,
+  isAuthed: true,
+  login: () => {},
+  logout: () => {},
+});
+
+export function AuthProvider({ children }) {
+  return (
+    <AuthCtx.Provider
+      value={{
+        user: null,
+        isAuthed: true,
+        login: () => {},
+        logout: () => {},
+      }}
+    >
+      {children}
+    </AuthCtx.Provider>
+  );
+}
+
+export function useAuth() {
+  return useContext(AuthCtx);
+}
+
+// Pass-through guard so existing usages don't break.
+export function Guard({ children }) {
+  return children;
+}
+
+/* import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useLocation, Navigate } from "react-router-dom";
 
 const AuthCtx = createContext(null);
@@ -44,3 +79,4 @@ export function Guard({ children }) {
   if (!isAuthed) return <Navigate to="/login" replace state={{ from: loc }} />;
   return children;
 }
+ */
