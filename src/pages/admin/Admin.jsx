@@ -11,11 +11,12 @@ import {
   LogoutButton,
   Page,
 } from "../../common";
-import Tabs from "../../common/Tabs"; // NEW
-import PerformancePatients from "./PerformancePatients"; // NEW
+import Tabs from "../../common/Tabs";
+import PerformancePatients from "./PerformancePatients";
 import Forecasts from "./Forecasts";
 import Downloads from "./Downloads";
 
+/* -------------------------- Demo table data -------------------------- */
 const allRows = [
   {
     clinic: "ON-T-EVD",
@@ -49,8 +50,37 @@ const allRows = [
   },
 ];
 
+/* ---------------------- Date card used in overview ------------------- */
+function DateStatCard({ value, onChange }) {
+  return (
+    <div className="bg-white rounded-2xl shadow-md p-4">
+      <div className="flex items-center gap-3">
+        {/* Icon bubble */}
+        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-xl">
+          📅
+        </div>
+
+        {/* Label + native date input */}
+        <div className="flex-1 min-w-0">
+          <div className="text-xs text-gray-500">Date</div>
+          <input
+            type="date"
+            value={value}
+            onChange={(e) => onChange?.(e.target.value)}
+            className="mt-2 w-full max-w-[210px] rounded-xl border border-gray-200 px-3 py-2 text-[15px] outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =============================== Page =============================== */
 export default function Admin() {
-  const today = new Date().toLocaleDateString("en-CA");
+  // YYYY-MM-DD for <input type="date" />
+  const [reportDate, setReportDate] = useState(() =>
+    new Date().toISOString().slice(0, 10)
+  );
 
   // tabs
   const [tab, setTab] = useState("overview");
@@ -128,17 +158,20 @@ export default function Admin() {
           <LogoutButton />
         </div>
       </div>
+
       {/* Overview stats */}
       <div className="mb-4">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <StatCard icon="📅" label="Date" value={today} />
+          <DateStatCard value={reportDate} onChange={setReportDate} />
+
+          {/* Keep your other stat cards — icons chosen to match the “bubble” look */}
           <StatCard
-            icon="📊"
+            icon="🏠"
             label="Production Report Submissions"
             value="1/40"
           />
           <StatCard
-            icon="💳"
+            icon="🐷"
             label="Collection Report Submissions"
             value="0/40"
           />
@@ -149,18 +182,19 @@ export default function Admin() {
           />
         </div>
       </div>
-      {/* Tabs (matches your reference UI) */}
+
+      {/* Tabs */}
       <Tabs
         value={tab}
         onChange={setTab}
         items={[
           { key: "overview", label: "Overview" },
-
           { key: "performance", label: "Performance & Patients" },
           { key: "forecasts", label: "Forecasts" },
           { key: "download", label: "Download" },
         ]}
       />
+
       {/* Overview table */}
       {tab === "overview" && (
         <div className="mt-2">
@@ -180,11 +214,10 @@ export default function Admin() {
           </Card>
         </div>
       )}
-      {tab === "performance" && <PerformancePatients />} {/* NEW */}
-      {tab === "performance" && <PerformancePatients />}{" "}
+
+      {tab === "performance" && <PerformancePatients />}
+      {tab === "forecasts" && <Forecasts />}
       {tab === "download" && <Downloads />}
-      {/* if you have this */} {tab === "forecasts" && <Forecasts />}{" "}
-      {/* NEW */}
     </Page>
   );
 }
