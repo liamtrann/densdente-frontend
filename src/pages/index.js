@@ -2,4 +2,5 @@ export { default as Admin } from "./admin/Admin";
 export { default as Report } from "./Report";
 export { default as Scheduling } from "./scheduling/Scheduling";
 export { default as Login } from "./authorize/Login";
-
+export { default as Password } from "./authorize/Password";
+export { default as Reporting } from "./reporting/Reporting";

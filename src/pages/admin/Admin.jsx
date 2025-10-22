@@ -127,8 +127,10 @@ export default function Admin() {
       header: "Management Actions",
       align: "right",
       nowrap: true,
-      render: () => (
+      render: (row) => (
         <Button
+          as={Link}
+          to={`/reporting/${encodeURIComponent(row.clinic)}`}
           size="sm"
           variant="outline"
           className="rounded-full px-4 py-1.5 border-2 border-indigo-300 text-indigo-700 hover:border-indigo-400"
