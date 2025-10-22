@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, RequireAuth } from "./frontend";
-import { Login, Signup, Report, Scheduling, Admin } from "./frontend/pages";
+import { Login, Report, Scheduling, Admin } from "./frontend/pages";
 import Password from "./frontend/pages/auth/Password.jsx";
 
 export default function App() {
@@ -9,7 +9,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          
           <Route path="/password" element={<Password />} />
           <Route path="/report" element={<Report />} />
 

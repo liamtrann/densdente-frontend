@@ -1,3 +1,4 @@
+// src/frontend/pages/auth/Login.jsx
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { useAuth } from "../../auth/AuthContext";
@@ -6,7 +7,7 @@ import {
   FormCard,
   FormField,
   FormSubmit,
-  FormAltLink,
+  FormAltLink, // still used for "reset password" link
 } from "../../common";
 import { verifyUser } from "../../auth/authStore";
 
@@ -21,8 +22,8 @@ export default function Login() {
   const from = location.state?.from?.pathname || "/admin";
 
   const [values, setValues] = useState({ email: "", password: "" });
-  const [touched, setTouched] = useState({}); // NEW
-  const [showPw, setShowPw] = useState(false); // NEW
+  const [touched, setTouched] = useState({});
+  const [showPw, setShowPw] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
 
@@ -48,7 +49,6 @@ export default function Login() {
   async function onSubmit(ev) {
     ev.preventDefault();
     setFormError("");
-    // mark all as touched so errors show if invalid
     setTouched({ email: true, password: true });
     if (!canSubmit) return;
 
@@ -59,7 +59,7 @@ export default function Login() {
         setFormError("Incorrect email or password.");
         return;
       }
-      login(user); // { email, name }
+      login(user);
       navigate(from, { replace: true });
     } finally {
       setSubmitting(false);
@@ -67,13 +67,14 @@ export default function Login() {
   }
 
   return (
-    <FormLayout > 
+    <FormLayout>
       <FormCard title="Sign In" onSubmit={onSubmit}>
         {formError && (
           <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
             {formError}
           </div>
         )}
+
         <FormField
           label="Email"
           name="email"
@@ -86,6 +87,7 @@ export default function Login() {
           error={errors.email}
           showError={!!touched.email}
         />
+
         <FormField
           label="Password"
           name="password"
@@ -116,9 +118,11 @@ export default function Login() {
             Click here to reset or change your password
           </FormAltLink>
         </div>
+
         <FormSubmit disabled={!canSubmit}>
           {submitting ? "Signing in…" : "Sign In"}
         </FormSubmit>
+
         <div className="mt-3">
           <a
             className="inline-block text-indigo-600 font-medium"
@@ -129,9 +133,7 @@ export default function Login() {
             Link to Dentaparse tutorial video
           </a>
         </div>
-        <div className="mt-3">
-          <FormAltLink to="/signup">Create an account</FormAltLink>
-        </div>
+
       </FormCard>
     </FormLayout>
   );
