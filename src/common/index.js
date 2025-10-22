@@ -14,5 +14,4 @@ export { default as Tabs } from "./Tabs";
 export { default as FormLayout } from "./FormLayout";
 export { default as FormCard } from "./FormCard";
 export { default as FormField } from "./FormField";
-export { default as FormSubmit } from "./FormSubmit";
 export { default as FormAltLink } from "./FormAltLink";

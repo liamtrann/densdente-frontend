@@ -1,4 +1,3 @@
-// src/frontend/pages/auth/Login.jsx
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { useAuth } from "../../auth/AuthContext";
@@ -6,8 +5,8 @@ import {
   FormLayout,
   FormCard,
   FormField,
-  FormSubmit,
   FormAltLink, // still used for "reset password" link
+  Button, // ✅ import Button from common
 } from "../../common";
 import { verifyUser } from "../../auth/authStore";
 
@@ -119,9 +118,15 @@ export default function Login() {
           </FormAltLink>
         </div>
 
-        <FormSubmit disabled={!canSubmit}>
+        {/* Submit button (uses shared Button) */}
+        <Button
+          as="button"
+          type="submit"
+          className="w-full"
+          disabled={!canSubmit}
+        >
           {submitting ? "Signing in…" : "Sign In"}
-        </FormSubmit>
+        </Button>
 
         <div className="mt-3">
           <a
@@ -133,7 +138,6 @@ export default function Login() {
             Link to Dentaparse tutorial video
           </a>
         </div>
-
       </FormCard>
     </FormLayout>
   );

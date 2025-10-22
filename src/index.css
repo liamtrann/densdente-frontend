@@ -3,3 +3,13 @@
 @tailwind utilities;
 
 html, body, #root { height: 100%; }
+
+/* full-width version used for form CTAs */
+.btn--block { width: 100%; }
+
+/* consistent disabled look */
+.btn--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}

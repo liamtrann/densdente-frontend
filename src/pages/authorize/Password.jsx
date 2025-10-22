@@ -1,11 +1,12 @@
+// src/pages/authorize/Password.jsx
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import {
   FormLayout,
   FormCard,
   FormField,
-  FormSubmit,
   FormAltLink,
+  Button, // ✅ use the shared Button
 } from "../../common";
 import { updateUserPassword } from "../../auth/authStore";
 
@@ -69,6 +70,7 @@ export default function Password() {
             {err}
           </div>
         )}
+
         <FormField
           label="Email"
           name="email"
@@ -81,6 +83,7 @@ export default function Password() {
           error={errors.email}
           showError={!!touched.email}
         />
+
         <FormField
           label="Current password"
           name="current"
@@ -93,6 +96,7 @@ export default function Password() {
           error={errors.current}
           showError={!!touched.current}
         />
+
         <FormField
           label="New password"
           name="next"
@@ -105,9 +109,18 @@ export default function Password() {
           error={errors.next}
           showError={!!touched.next}
         />
-        <FormSubmit disabled={!canSubmit}>
+
+        {/* Replaces FormSubmit */}
+        <Button
+          as="button"
+          type="submit"
+          block
+          disabled={!canSubmit}
+          aria-busy={submitting}
+        >
           {submitting ? "Updating…" : "Update password"}
-        </FormSubmit>
+        </Button>
+
         <div className="mt-3">
           <FormAltLink to="/login">Back to sign in</FormAltLink>
         </div>
