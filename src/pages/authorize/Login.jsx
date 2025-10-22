@@ -1,76 +1,59 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { useAuth } from "../../auth/AuthContext";
 import {
   FormLayout,
   FormCard,
   FormField,
-  FormAltLink, // still used for "reset password" link
-  Button, // ✅ import Button from common
+  FormAltLink,
+  Button,
 } from "../../common";
 import { verifyUser } from "../../auth/authStore";
 
-function validateEmail(v) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-}
+const schema = z.object({
+  email: z.string().email("Enter a valid email"),
+  password: z.string().min(6, "Min. 6 characters"),
+});
 
 export default function Login() {
   const { login } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || "/admin";
+  const nav = useNavigate();
+  const loc = useLocation();
+  const from = loc.state?.from?.pathname || "/admin";
 
-  const [values, setValues] = useState({ email: "", password: "" });
-  const [touched, setTouched] = useState({});
-  const [showPw, setShowPw] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [formError, setFormError] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isValid },
+    setError,
+    clearErrors,
+  } = useForm({
+    resolver: zodResolver(schema),
+    mode: "onTouched",
+    defaultValues: { email: "", password: "" },
+  });
 
-  const errors = useMemo(() => {
-    const e = {};
-    if (!values.email) e.email = "Email is required";
-    else if (!validateEmail(values.email)) e.email = "Enter a valid email";
-    if (!values.password) e.password = "Password is required";
-    else if (values.password.length < 6) e.password = "Min. 6 characters";
-    return e;
-  }, [values]);
-
-  const canSubmit =
-    values.email &&
-    values.password &&
-    Object.keys(errors).length === 0 &&
-    !submitting;
-
-  function markTouched(field) {
-    setTouched((t) => ({ ...t, [field]: true }));
-  }
-
-  async function onSubmit(ev) {
-    ev.preventDefault();
-    setFormError("");
-    setTouched({ email: true, password: true });
-    if (!canSubmit) return;
-
-    try {
-      setSubmitting(true);
-      const user = verifyUser(values.email, values.password);
-      if (!user) {
-        setFormError("Incorrect email or password.");
-        return;
-      }
-      login(user);
-      navigate(from, { replace: true });
-    } finally {
-      setSubmitting(false);
+  async function onSubmit(values) {
+    clearErrors("root");
+    const user = verifyUser(values.email, values.password);
+    if (!user) {
+      setError("root", { message: "Incorrect email or password." });
+      return;
     }
+    login(user);
+    nav(from, { replace: true });
   }
 
   return (
     <FormLayout>
-      <FormCard title="Sign In" onSubmit={onSubmit}>
-        {formError && (
+      <FormCard title="Sign In" onSubmit={handleSubmit(onSubmit)}>
+        {/* banner for form-level errors */}
+        {errors.root?.message && (
           <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-            {formError}
+            {errors.root.message}
           </div>
         )}
 
@@ -79,37 +62,17 @@ export default function Login() {
           name="email"
           type="email"
           placeholder="Enter your email"
-          required
-          value={values.email}
-          onChange={(e) => setValues((v) => ({ ...v, email: e.target.value }))}
-          onBlur={() => markTouched("email")}
-          error={errors.email}
-          showError={!!touched.email}
+          register={register}
+          error={errors.email?.message}
         />
 
         <FormField
           label="Password"
           name="password"
-          type={showPw ? "text" : "password"}
+          type="password"
           placeholder="Min. 6 characters"
-          required
-          value={values.password}
-          onChange={(e) =>
-            setValues((v) => ({ ...v, password: e.target.value }))
-          }
-          onBlur={() => markTouched("password")}
-          error={errors.password}
-          showError={!!touched.password}
-          rightIcon={
-            <button
-              type="button"
-              aria-label="Toggle password visibility"
-              className="text-gray-400 hover:text-gray-600"
-              onClick={() => setShowPw((s) => !s)}
-            >
-              {showPw ? "🙈" : "👁️"}
-            </button>
-          }
+          register={register}
+          error={errors.password?.message}
         />
 
         <div className="mb-2">
@@ -118,14 +81,13 @@ export default function Login() {
           </FormAltLink>
         </div>
 
-        {/* Submit button (uses shared Button) */}
         <Button
           as="button"
           type="submit"
           className="w-full"
-          disabled={!canSubmit}
+          disabled={!isValid || isSubmitting}
         >
-          {submitting ? "Signing in…" : "Sign In"}
+          {isSubmitting ? "Signing in…" : "Sign In"}
         </Button>
 
         <div className="mt-3">

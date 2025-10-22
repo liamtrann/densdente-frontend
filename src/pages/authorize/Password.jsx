@@ -1,73 +1,57 @@
-// src/pages/authorize/Password.jsx
 import { useNavigate } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
   FormLayout,
   FormCard,
   FormField,
   FormAltLink,
-  Button, // ✅ use the shared Button
+  Button,
 } from "../../common";
 import { updateUserPassword } from "../../auth/authStore";
 
-function isEmail(v) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-}
+const schema = z.object({
+  email: z.string().email("Enter a valid email"),
+  current: z.string().min(1, "Current password is required"),
+  next: z.string().min(6, "Min. 6 characters"),
+});
 
 export default function Password() {
   const nav = useNavigate();
-  const [vals, setVals] = useState({ email: "", current: "", next: "" });
-  const [touched, setTouched] = useState({});
-  const [err, setErr] = useState("");
-  const [submitting, setSubmitting] = useState(false);
 
-  const errors = useMemo(() => {
-    const e = {};
-    if (!vals.email) e.email = "Email is required";
-    else if (!isEmail(vals.email)) e.email = "Enter a valid email";
-    if (!vals.current) e.current = "Current password is required";
-    if (!vals.next) e.next = "New password is required";
-    else if (vals.next.length < 6) e.next = "Min. 6 characters";
-    return e;
-  }, [vals]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isValid },
+    setError,
+    clearErrors,
+  } = useForm({
+    resolver: zodResolver(schema),
+    mode: "onTouched",
+    defaultValues: { email: "", current: "", next: "" },
+  });
 
-  const canSubmit =
-    vals.email &&
-    vals.current &&
-    vals.next &&
-    Object.keys(errors).length === 0 &&
-    !submitting;
-
-  function touch(f) {
-    setTouched((t) => ({ ...t, [f]: true }));
-  }
-
-  async function onSubmit(ev) {
-    ev.preventDefault();
-    setErr("");
-    setTouched({ email: true, current: true, next: true });
-    if (!canSubmit) return;
-
+  async function onSubmit(values) {
+    clearErrors("root");
     try {
-      setSubmitting(true);
-      await updateUserPassword(vals.email, vals.current, vals.next);
+      await updateUserPassword(values.email, values.current, values.next);
       nav("/login", {
         replace: true,
         state: { msg: "Password updated. Please sign in." },
       });
     } catch (e) {
-      setErr(e?.message || "Unable to update password.");
-    } finally {
-      setSubmitting(false);
+      setError("root", { message: e?.message || "Unable to update password." });
     }
   }
 
   return (
     <FormLayout>
-      <FormCard title="Change Password" onSubmit={onSubmit}>
-        {err && (
+      <FormCard title="Change Password" onSubmit={handleSubmit(onSubmit)}>
+        {errors.root?.message && (
           <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-            {err}
+            {errors.root.message}
           </div>
         )}
 
@@ -76,12 +60,8 @@ export default function Password() {
           name="email"
           type="email"
           placeholder="your@email.com"
-          required
-          value={vals.email}
-          onChange={(e) => setVals((v) => ({ ...v, email: e.target.value }))}
-          onBlur={() => touch("email")}
-          error={errors.email}
-          showError={!!touched.email}
+          register={register}
+          error={errors.email?.message}
         />
 
         <FormField
@@ -89,12 +69,8 @@ export default function Password() {
           name="current"
           type="password"
           placeholder="Your current password"
-          required
-          value={vals.current}
-          onChange={(e) => setVals((v) => ({ ...v, current: e.target.value }))}
-          onBlur={() => touch("current")}
-          error={errors.current}
-          showError={!!touched.current}
+          register={register}
+          error={errors.current?.message}
         />
 
         <FormField
@@ -102,23 +78,17 @@ export default function Password() {
           name="next"
           type="password"
           placeholder="Min. 6 characters"
-          required
-          value={vals.next}
-          onChange={(e) => setVals((v) => ({ ...v, next: e.target.value }))}
-          onBlur={() => touch("next")}
-          error={errors.next}
-          showError={!!touched.next}
+          register={register}
+          error={errors.next?.message}
         />
 
-        {/* Replaces FormSubmit */}
         <Button
           as="button"
           type="submit"
-          block
-          disabled={!canSubmit}
-          aria-busy={submitting}
+          className="w-full"
+          disabled={!isValid || isSubmitting}
         >
-          {submitting ? "Updating…" : "Update password"}
+          {isSubmitting ? "Updating…" : "Update password"}
         </Button>
 
         <div className="mt-3">

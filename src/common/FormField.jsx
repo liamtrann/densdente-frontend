@@ -7,46 +7,45 @@ export default function FormField({
   placeholder,
   value,
   onChange,
-  onBlur, // pass from parent to mark as touched
-  error,
+  onBlur,
   required,
-  showError, // parent decides when to show (touched or submit)
-  rightIcon, // optional (e.g., eye icon toggle)
+  error,
+  showError = true,
+  rightIcon,
+  register, // <-- new
+  rules, // <-- new
 }) {
   const id = useId();
-  const danger = showError && !!error;
+  const inputProps = register
+    ? { ...register(name, rules) } // RHF controls
+    : { value, onChange, onBlur }; // fallback controlled
 
   return (
-    <div className="mb-4">
-      <label htmlFor={id} className="block text-sm font-medium text-gray-800">
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium">
         {label} {required && <span className="text-rose-600">*</span>}
       </label>
 
-      <div className={`mt-2 relative`}>
+      <div className="mt-2 relative">
         <input
           id={id}
           name={name}
           type={type}
           placeholder={placeholder}
           required={required}
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur}
-          className={`w-full rounded-xl border px-4 py-3 outline-none transition
-            ${
-              danger
-                ? "border-rose-400 focus:ring-2 focus:ring-rose-400"
-                : "border-gray-200 focus:ring-2 focus:ring-indigo-500"
-            }`}
+          className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
+          {...inputProps}
         />
         {rightIcon && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 select-none">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
             {rightIcon}
           </div>
         )}
       </div>
 
-      {danger && <p className="mt-1 text-xs text-rose-600">{error}</p>}
+      {showError && error && (
+        <p className="mt-1 text-xs text-rose-600">{error}</p>
+      )}
     </div>
   );
 }
