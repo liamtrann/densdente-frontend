@@ -10,9 +10,12 @@ import {
   LogoutButton,
   Page,
   Tabs,
+  DataTable, // (optional here; not used now but fine to keep)
 } from "../../common";
-import Forecasting from "./Forecasting"; // <-- already added earlier
-import NewPatients from "./NewPatients"; // <-- NEW import
+import Forecasting from "./Forecasting";
+import NewPatients from "./NewPatients";
+import CollectionBreakdown from "./CollectionBreakdown"; // <-- NEW
+import PerformanceGlance from "./PerformanceGlance"; // <-- NEW
 
 /* -----------------------------------------------------------
    Demo data (replace with API later)
@@ -140,130 +143,140 @@ export default function Reporting() {
         onChange={setTab}
         items={[
           { key: "financial", label: "Financial Reporting" },
-          { key: "patients", label: "New Patients" }, // enabled
+          { key: "patients", label: "New Patients" },
           { key: "forecast", label: "Forecasting" },
         ]}
       />
 
       {/* FINANCIAL TAB */}
       {tab === "financial" && (
-        <Card className="mt-4">
-          <h2 className="text-lg font-bold mb-4">
-            {clinicId}'s Performance Report
-          </h2>
+        <>
+          <Card className="mt-4">
+            <h2 className="text-lg font-bold mb-4">
+              {clinicId}'s Performance Report
+            </h2>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* LEFT: practitioners list */}
-            <Card className="shadow-none">
-              <div className="divide-y rounded-xl border border-gray-100 overflow-hidden">
-                {roster.map((p) => {
-                  const selected = p.id === activePerson?.id;
-                  return (
-                    <button
-                      key={p.id}
-                      onClick={() => setActivePid(p.id)}
-                      className={`w-full flex items-center justify-between px-4 py-3 text-left ${
-                        selected ? "bg-indigo-50" : "bg-white"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Badge color={p.role === "DDS" ? "neutral" : "success"}>
-                          {p.role}
-                        </Badge>
-                        <span className="font-medium">{p.name}</span>
-                      </div>
-                      <Badge color="success">{p.status}</Badge>
-                    </button>
-                  );
-                })}
-              </div>
-            </Card>
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* LEFT: practitioners list */}
+              <Card className="shadow-none">
+                <div className="divide-y rounded-xl border border-gray-100 overflow-hidden">
+                  {roster.map((p) => {
+                    const selected = p.id === activePerson?.id;
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => setActivePid(p.id)}
+                        className={`w-full flex items-center justify-between px-4 py-3 text-left ${
+                          selected ? "bg-indigo-50" : "bg-white"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Badge
+                            color={p.role === "DDS" ? "neutral" : "success"}
+                          >
+                            {p.role}
+                          </Badge>
+                          <span className="font-medium">{p.name}</span>
+                        </div>
+                        <Badge color="success">{p.status}</Badge>
+                      </button>
+                    );
+                  })}
+                </div>
+              </Card>
 
-            {/* RIGHT: form */}
-            <form onSubmit={onSubmit}>
-              <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-base font-semibold">
-                  Cost & Production Breakdown for{" "}
-                  <span className="font-bold">{activePerson?.name || "—"}</span>
-                </h3>
-                {activePerson && (
-                  <>
-                    <Badge color="neutral">{activePerson.role}</Badge>
-                    <Badge color="success">{activePerson.status}</Badge>
-                  </>
-                )}
-              </div>
+              {/* RIGHT: form */}
+              <form onSubmit={onSubmit}>
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="text-base font-semibold">
+                    Cost & Production Breakdown for{" "}
+                    <span className="font-bold">
+                      {activePerson?.name || "—"}
+                    </span>
+                  </h3>
+                  {activePerson && (
+                    <>
+                      <Badge color="neutral">{activePerson.role}</Badge>
+                      <Badge color="success">{activePerson.status}</Badge>
+                    </>
+                  )}
+                </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  label="Production *"
-                  placeholder="Enter production value"
-                  value={vals.production}
-                  onChange={(e) =>
-                    setVals((v) => ({ ...v, production: e.target.value }))
-                  }
-                  error={requiredErrors.production}
-                  showError
-                />
-                <FormField
-                  label="Collection *"
-                  placeholder="Enter collection value"
-                  value={vals.collection}
-                  onChange={(e) =>
-                    setVals((v) => ({ ...v, collection: e.target.value }))
-                  }
-                  error={requiredErrors.collection}
-                  showError
-                />
-                <FormField
-                  label="Lab Costs"
-                  placeholder="Enter lab costs"
-                  value={vals.lab}
-                  onChange={(e) =>
-                    setVals((v) => ({ ...v, lab: e.target.value }))
-                  }
-                />
-                <FormField
-                  label="Material Costs"
-                  placeholder="Enter material costs"
-                  value={vals.material}
-                  onChange={(e) =>
-                    setVals((v) => ({ ...v, material: e.target.value }))
-                  }
-                />
-                <FormField
-                  label="Invisalign Costs"
-                  placeholder="Enter Invisalign costs"
-                  value={vals.invisalign}
-                  onChange={(e) =>
-                    setVals((v) => ({ ...v, invisalign: e.target.value }))
-                  }
-                />
-                <FormField
-                  label="Hours Worked *"
-                  placeholder="Enter hours worked"
-                  value={vals.hours}
-                  onChange={(e) =>
-                    setVals((v) => ({ ...v, hours: e.target.value }))
-                  }
-                  error={requiredErrors.hours}
-                  showError
-                />
-              </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    label="Production *"
+                    placeholder="Enter production value"
+                    value={vals.production}
+                    onChange={(e) =>
+                      setVals((v) => ({ ...v, production: e.target.value }))
+                    }
+                    error={requiredErrors.production}
+                    showError
+                  />
+                  <FormField
+                    label="Collection *"
+                    placeholder="Enter collection value"
+                    value={vals.collection}
+                    onChange={(e) =>
+                      setVals((v) => ({ ...v, collection: e.target.value }))
+                    }
+                    error={requiredErrors.collection}
+                    showError
+                  />
+                  <FormField
+                    label="Lab Costs"
+                    placeholder="Enter lab costs"
+                    value={vals.lab}
+                    onChange={(e) =>
+                      setVals((v) => ({ ...v, lab: e.target.value }))
+                    }
+                  />
+                  <FormField
+                    label="Material Costs"
+                    placeholder="Enter material costs"
+                    value={vals.material}
+                    onChange={(e) =>
+                      setVals((v) => ({ ...v, material: e.target.value }))
+                    }
+                  />
+                  <FormField
+                    label="Invisalign Costs"
+                    placeholder="Enter Invisalign costs"
+                    value={vals.invisalign}
+                    onChange={(e) =>
+                      setVals((v) => ({ ...v, invisalign: e.target.value }))
+                    }
+                  />
+                  <FormField
+                    label="Hours Worked *"
+                    placeholder="Enter hours worked"
+                    value={vals.hours}
+                    onChange={(e) =>
+                      setVals((v) => ({ ...v, hours: e.target.value }))
+                    }
+                    error={requiredErrors.hours}
+                    showError
+                  />
+                </div>
 
-              <div className="mt-5 flex justify-end">
-                <Button as="button" type="submit" disabled={!canSubmit}>
-                  Submit
-                </Button>
-              </div>
+                <div className="mt-5 flex justify-end">
+                  <Button as="button" type="submit" disabled={!canSubmit}>
+                    Submit
+                  </Button>
+                </div>
 
-              <div className="mt-2 text-xs text-gray-500">
-                Fields marked with <span className="text-rose-600">*</span> are
-                required
-              </div>
-            </form>
-          </div>
-        </Card>
+                <div className="mt-2 text-xs text-gray-500">
+                  Fields marked with <span className="text-rose-600">*</span>{" "}
+                  are required
+                </div>
+              </form>
+            </div>
+          </Card>
+
+          {/* NEW PANELS UNDER THE FINANCIAL REPORT */}
+          <CollectionBreakdown clinicId={clinicId} />
+          <PerformanceGlance />
+        </>
       )}
 
       {/* NEW PATIENTS TAB */}
